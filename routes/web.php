@@ -25,6 +25,8 @@ Route::group(['prefix'=>'admin', 'middleware'=>'auth'], function(){
     Route::get('students', 'AdminStudentController@index')->name('admin.students');
     Route::get('student/create', 'AdminStudentController@create')->name('admin.student.create');
     Route::post('student/store', 'AdminStudentController@store')->name('admin.student.store');
+    Route::get('student/init', 'AdminStudentController@init')->name('admin.student.init');
+    Route::get('student/sections', 'AdminStudentController@sections')->name('admin.student.sections');
     Route::get('enrollement', 'AdminEnrollmentController@index')->name('admin.enrollment');
 
     Route::get('subjects', 'AdminSubjectsController@index')->name('admin.subjects');
