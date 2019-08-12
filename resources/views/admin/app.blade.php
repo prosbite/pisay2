@@ -10,11 +10,12 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <!-- <script src="{{ asset('js/app.js') }}" defer></script> -->
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="{{asset('css/toastr.min.css')}}" rel="stylesheet">
     <link href="{{asset('css/custom.css')}}" rel="stylesheet">
 
     <!-- Styles -->
@@ -79,7 +80,7 @@
                     <div class="col-md-3">
                         <ul class="list-group">
                             <li class="list-group-item {{ $nav == 'dashboard' ? 'navi-active':''}}"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
-                            <li class="list-group-item {{ $nav == 'enrollment' ? 'navi-active':''}}"><a href="{{route('admin.enrollment')}}">Enrollment</a></li>
+                            <li class="list-group-item {{ $nav == 'students' ? 'navi-active':''}}"><a href="{{route('admin.students')}}">Students</a></li>
                             <li class="list-group-item {{ $nav == 'subjects' ? 'navi-active':''}}"><a href="{{route('admin.subjects')}}">Subjects</a></li>
                             <li class="list-group-item {{ $nav == 'sections' ? 'navi-active':''}}"><a href="{{route('admin.sections')}}">Sections</a></li>
                         </ul>
@@ -92,5 +93,23 @@
             </div>
         </main>
     </div>
+
+    <script src="{{asset('js/jquery.min.js')}}"></script>
+    <script src="{{asset('js/toastr.min.js')}}"></script>
+    <script src="{{asset('js/vue.min.js')}}"></script>
+
+    <script>
+        @if(Session::has('info'))
+            toastr.info("{{Session::get('info')}}");
+        @endif
+        @if(Session::has('success'))
+            toastr.success("{{Session::get('success')}}");
+        @endif
+        @if(Session::has('danger'))
+            toastr.danger("{{Session::get('danger')}}");
+        @endif
+    </script>
+
+    @yield('js')
 </body>
 </html>

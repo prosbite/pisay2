@@ -20,7 +20,7 @@
                     @foreach($sections as $section)
                         <tr>
                             <td>{{$section->section_name}}</td>
-                            <td>{{$section->grade_level}}</td>
+                            <td>{{$section->grade_level_id}}</td>
                             <td>
                                 <a href="{{route('admin.section.delete',['id'=>$section->id])}}" class="btn btn-danger btn-sm float-right">Delete</a>
                                 <a href="" class="btn btn-success btn-sm float-right" style="margin-right:5px;">Edit</a>

@@ -3,92 +3,119 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Session;
+use App\Student;
+use App\Enrollment;
 
 class AdminStudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function index()
     {
-        return view('admin.students.index')->with('nav', 'enrollment');
+        return view('admin.students.index')->with(['nav'=>'students', 'students'=>\App\Enrollment::enrolled()]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+   
     public function create()
     {
-        return view('admin.students.create')->with('nav', 'enrollment');
+        $sections = \App\Section::all();
+        $subjects = \App\Subject::all();
+
+        if($sections->count() == 0 || $subjects->count() == 0){
+            Session::flash('info', 'There are no subjects or section yet.');
+            return redirect()->back();
+        }
+        return view('admin.students.create')->with([
+            'nav' => 'students',
+            'sections' => $sections,
+            'subjects' => $subjects
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+  
     public function store(Request $request)
     {
+        $sy = \App\SchoolYear::where('active', 1)->first();   
+        // dd($sy->id);     
         $this->validate($request, [
             'firstname' => 'required',
             'middlename' => 'required',
             'lastname' => 'required',
             'gender' => 'required',
-            'email' => 'required|email',
-            'contact_no' => 'required',
-            'address' => 'required',
             'birthdate' => 'required'
         ]);
-        dd($request->all());
+        $request = (object) $this->fillNull($request->all());
+        $student = new Student;
+        $student->firstname = $request->firstname;
+        $student->middlename = $request->middlename;
+        $student->lastname = $request->lastname;
+        $student->gender = $request->gender;
+        $student->birthdate = $request->birthdate;
+        $student->email = $request->email;
+        $student->address = $request->address;
+        $student->contact_no = $request->contact_no;
+
+        if($student->save()){
+            $enrollment = new Enrollment;
+            $enrollment->student_id = $student->id;
+            $enrollment->section_id = $request->sections;
+            $enrollment->grade_level = $request->grade_levels;
+            $enrollment->sy = $sy->id;
+            if($enrollment->save()){
+                Session::flash('success', 'A new student has been added successfully!');
+                return redirect(route('admin.students'));
+            }
+        }
+
+        Session:flash('danger', 'Something went wrong, please try again.');
+        return redirect(route('admin.student.create'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+   
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function destroy($id)
     {
         //
     }
+
+    public function init(){
+        $gradeLevels = \App\GradeLevel::all();
+        if(count($gradeLevels) > 0){
+            return ['grade_levels'=>$gradeLevels, 
+            'sections'=>\App\GradeLevel::find($gradeLevels[0]->id)->sections()->get()];
+        }
+        return ['grade_levels'=>$gradeLevels, 
+            'sections'=>[]];       
+    }
+
+    public function sections(Request $request){
+        return \App\GradeLevel::find($request->gl)->sections()->get();
+    }
+
+    public function fillNull($request){
+        foreach($request as $index=>$value){
+            if($value == null){
+                $request[$index] = "";
+            }
+        }
+        return $request;
+    }
+    
 }

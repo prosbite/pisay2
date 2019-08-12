@@ -29,7 +29,7 @@ class AdminSectionsController extends Controller
         ]);
         $section = new Section;
         $section->section_name = $request->section_name;
-        $section->grade_level = $request->grade_level;
+        $section->grade_level_id = $request->grade_level;
         $section->save();
 
         return redirect(route('admin.sections'));
